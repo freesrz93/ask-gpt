@@ -1,0 +1,41 @@
+version: 3
+
+vars:
+  Package: github.com/freesrz93/ask-gpt
+  Constants: '{{.Package}}/consts'
+  BinDir: build
+  BinName: ag
+  Version:
+    sh: git describe --tags
+  BuiltBy:
+    sh: go version
+
+  GoBuild: >-
+    go build -trimpath -ldflags 
+    '-X "{{.Constants}}.Version={{.Version}}"
+    -X "{{.Constants}}.BuiltAt={{now | date "2006/01/02 15:04:05 UTC-07"}}"
+    -X "{{.Constants}}.BuiltBy={{.BuiltBy}}"
+    -s'
+
+tasks:
+  linux-amd64:
+    cmd: 'GOOS=linux GOARCH=amd64 {{.GoBuild}} -o {{.BinDir}}/{{.BinName}}-{{.TASK}}'
+  linux-arm64:
+    cmd: 'GOOS=linux GOARCH=arm64 {{.GoBuild}} -o {{.BinDir}}/{{.BinName}}-{{.TASK}}'
+  darwin-amd64:
+    cmd: 'GOOS=darwin GOARCH=amd64 {{.GoBuild}} -o {{.BinDir}}/{{.BinName}}-{{.TASK}}'
+  darwin-arm64:
+    cmd: 'GOOS=darwin GOARCH=arm64 {{.GoBuild}} -o {{.BinDir}}/{{.BinName}}-{{.TASK}}'
+  windows-amd64:
+    aliases: [ build, b ]
+    cmd: 'GOOS=windows GOARCH=amd64 {{.GoBuild}} -o {{.BinDir}}/{{.BinName}}-{{.TASK}}.exe'
+  windows-arm64:
+    cmd: 'GOOS=windows GOARCH=arm64 {{.GoBuild}} -o {{.BinDir}}/{{.BinName}}-{{.TASK}}.exe'
+  build-all:
+    deps:
+      - linux-amd64
+      - linux-arm64
+      - darwin-amd64
+      - darwin-arm64
+      - windows-amd64
+      - windows-arm64
