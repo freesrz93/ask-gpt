@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"io"
 	"os"
 	"strings"
 
@@ -77,6 +78,13 @@ func handleSession(cmd *cobra.Command, args []string) error {
 	}
 
 	input := strings.Join(args, " ")
+	stat, _ := os.Stdin.Stat()
+	if (stat.Mode() & os.ModeCharDevice) == 0 {
+		pipe, err := io.ReadAll(os.Stdin)
+		if err == nil {
+			input = string(pipe) + "\n" + input
+		}
+	}
 	if input != "" {
 		P(AIPrefix)
 		err = Client.Stream(s, input)
