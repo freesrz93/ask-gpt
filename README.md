@@ -1,12 +1,15 @@
 # Ask GPT
 
-Ask GPT is a CLI tool to chat with OpenAI LLMs.
+English | [简体中文](./README_ZH.md)
+
+Ask GPT is a CLI tool to chat with OpenAI LLMs via API.
 
 ## Features
 
-- **Custom Roles**: Customise multi roles, each with its own system prompt to tailor interactions.
+- **Custom Roles**: Customise multi roles, each with its own system prompt.
 - **Save/Retrieve Conversations**: Save conversations locally and continue it seamlessly in the future.
 - **Streaming Output**: See the output instantly after an input, no need to wait for completion.
+- **Support Pipeline**: Send any output of other CLI tools to AI via pipeline.
 - **Interactive mode**: Chat with AI interactively. Offer a user experience similar to the web-based ChatGPT.
 - **Support Models**: Compatibility with all models accessible through the OpenAI API.
 - **Edit Config Easily**: One-click access to configuration file for easy setup and customization.
@@ -17,7 +20,11 @@ Download the pre-built binary from [release](https://github.com/freesrz93/ask-gp
 
 ## Usage
 
-1. After the first run, the app will create the config file at
+1. Run ask-gpt for the first time:
+   ```shell
+   ag -v
+   ```
+   and the app will create the config file at
     ```
     %USERPROFILE%/.config/ask-gpt/config.yaml
     ```
@@ -48,29 +55,33 @@ Download the pre-built binary from [release](https://github.com/freesrz93/ask-gp
    ag -s "translation" -i "Translate the given sentences to Chinese"
    ```
 
-6. To create a new role, use `-n`:
+6. Use pipeline:
+   ```shell
+   cat raw.txt | ag -i "Translate above contents to Chinese"
+   ```
+
+7. To create a new role, use `-n`:
    ```shell
    ag -n
    ```
    then set its name, description and prompt interactively.
 
-7. To use a role, use `-r` (the role should already exist):
+8. To use a role, use `-r` (the role should already exist):
    ```shell
    ag -r "translator" -i "Translate the given sentences to Chinese"
    ```
    `-r` can be used with `-s` but only valid when creating a conversation.
 
-8. To show history of the conversation, use `-h`:
+9. To show history of the conversation, use `-h`:
    ```shell
    ag -s "translation" -h -i
    ```
    this will print previous messages and continue with interactive mode.
 
-9. For more usage, see:
-
-   ```shell
-   chatgpt --help
-   ```
+10. For more usage, see:
+    ```shell
+    chatgpt --help
+    ```
 
 ## Configuration
 
