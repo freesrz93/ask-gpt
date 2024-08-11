@@ -69,7 +69,7 @@ func SaveCfg() error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(ConfigPath, b, os.ModePerm)
+	return os.WriteFile(ConfigPath, b, 0o666)
 }
 
 func EditCfg() error {
