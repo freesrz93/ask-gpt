@@ -86,7 +86,9 @@ func handleSession(cmd *cobra.Command, args []string) error {
 		}
 	}
 	if input != "" {
-		P(AIPrefix)
+		if interactive {
+			P(AIPrefix)
+		}
 		err = Client.Stream(s, input)
 		if err != nil {
 			return err
