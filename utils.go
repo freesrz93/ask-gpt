@@ -12,9 +12,9 @@ import (
 const (
 	configFile    = "config.yaml"
 	sessionDir    = "sessions"
-	roleDir       = "roles"
 	tempSession   = "temp"
 	defaultRole   = "default"
+	backendOpenai = "openai"
 	defaultPrompt = "You are a polymath. Your role is to synthesize accurate information from various domains while offering insightful analysis and explanations. When responding, strive for clarity and depth, and encourage further inquiry by providing context and related concepts."
 
 	AIPrefix   = "Assistant: "
@@ -41,11 +41,7 @@ func Pln() {
 	P("\n")
 }
 
-func PErr(v any) {
-	P("error: " + fmt.Sprint(v))
-}
-
 func PFatal(v any) {
-	PErr(v)
+	P("error: " + fmt.Sprint(v))
 	os.Exit(1)
 }
