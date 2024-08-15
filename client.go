@@ -8,21 +8,18 @@ import (
 	"github.com/sashabaranov/go-openai"
 )
 
-var (
-	Client *C
-)
-
-func InitClient() {
-	cfg := openai.DefaultConfig(Config.APIKey)
-	cfg.BaseURL = Config.BaseURL
-	Client = &C{Client: openai.NewClientWithConfig(cfg)}
+func NewClient(opt *BackendOption) *Client {
+	cfg := openai.DefaultConfig(opt.APIKey)
+	cfg.BaseURL = opt.BaseURL
+	return &Client{Client: openai.NewClientWithConfig(cfg)}
 }
 
-type C struct {
+type Client struct {
+	*BackendOption
 	*openai.Client
 }
 
-func (c *C) Stream(s *Session, input string) error {
+func (c *Client) Stream(s *Session, input string) error {
 	defer Pln()
 
 	s.Append(openai.ChatCompletionMessage{
@@ -33,13 +30,13 @@ func (c *C) Stream(s *Session, input string) error {
 	// https://platform.openai.com/docs/api-reference/chat
 	stream, err := c.CreateChatCompletionStream(context.Background(), openai.ChatCompletionRequest{
 		Messages:         s.Get(),
-		Model:            Config.Model,
-		MaxTokens:        Config.MaxTokens,
-		Temperature:      Config.Temperature,
-		TopP:             Config.TopP,
+		Model:            c.Model,
+		MaxTokens:        c.MaxTokens,
+		Temperature:      c.Temperature,
+		TopP:             c.TopP,
 		Stream:           true,
-		PresencePenalty:  Config.PresencePenalty,
-		FrequencyPenalty: Config.FrequencyPenalty,
+		PresencePenalty:  c.PresencePenalty,
+		FrequencyPenalty: c.FrequencyPenalty,
 	})
 	if err != nil {
 		return err

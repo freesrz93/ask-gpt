@@ -2,6 +2,8 @@ package main
 
 import (
 	"bufio"
+	"errors"
+	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -21,6 +23,7 @@ var (
 	showVersion  bool
 	sessionName  string
 	roleName     string
+	backendName  string
 	newRole      bool
 )
 
@@ -46,8 +49,8 @@ func root(cmd *cobra.Command, args []string) {
 			Pln()
 		}
 	case listRoles:
-		for _, role := range ListRoles() {
-			P(role.String())
+		for name, r := range Config.Roles {
+			P(fmt.Sprintf("name: %s\ndescription: %s\nprompt: %s\n", name, r.Description, r.Prompt))
 			Pln()
 		}
 	case newRole:
@@ -61,17 +64,11 @@ func root(cmd *cobra.Command, args []string) {
 	}
 }
 
-func handleSession(cmd *cobra.Command, args []string) error {
-	r, err := GetRole(roleName)
+func handleSession(_ *cobra.Command, args []string) error {
+	c, s, err := initClient()
 	if err != nil {
 		return err
 	}
-
-	s, err := GetSession(sessionName)
-	if err != nil {
-		return err
-	}
-	s.UseRole(r)
 
 	if showHistory {
 		P(s.String())
@@ -89,17 +86,41 @@ func handleSession(cmd *cobra.Command, args []string) error {
 		if interactive {
 			P(AIPrefix)
 		}
-		err = Client.Stream(s, input)
+		err = c.Stream(s, input)
 		if err != nil {
 			return err
 		}
 	}
 
 	if interactive {
-		interactiveMode(input, s)
+		interactiveMode(c, s, input)
 		return nil
 	}
 	return nil
+}
+
+func initClient() (*Client, *Session, error) {
+	if backendName == "" {
+		backendName = Config.DefaultBackend
+	}
+	opt, ok := Config.Backends[backendName]
+	if !ok {
+		return nil, nil, errors.New("backend not exist")
+	}
+	if roleName == "" {
+		roleName = opt.DefaultRole
+	}
+	r, err := GetRole(roleName)
+	if err != nil {
+		return nil, nil, err
+	}
+	client := NewClient(opt)
+	s, err := GetSession(sessionName)
+	if err != nil {
+		return nil, nil, err
+	}
+	s.UseRole(r)
+	return client, s, nil
 }
 
 func createRole() {
@@ -129,7 +150,7 @@ func createRole() {
 	P("Role " + name + " created!")
 }
 
-func interactiveMode(input string, s *Session) {
+func interactiveMode(client *Client, s *Session, input string) {
 	scanner := bufio.NewScanner(os.Stdin)
 	P(UserPrefix)
 	for scanner.Scan() {
@@ -138,7 +159,7 @@ func interactiveMode(input string, s *Session) {
 			break
 		}
 		P(AIPrefix)
-		err := Client.Stream(s, input)
+		err := client.Stream(s, input)
 		if err != nil {
 			PFatal(err)
 		}
@@ -155,7 +176,8 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&interactive, "interactive", "i", false, "Use interactive mode. (default: false)")
 	rootCmd.PersistentFlags().BoolVarP(&showHistory, "history", "h", false, "Show session history. (default: false)")
 	rootCmd.PersistentFlags().StringVarP(&sessionName, "session", "s", tempSession, "Create or retrieve a session. If not set, create a temp session that won't be saved.")
-	rootCmd.PersistentFlags().StringVarP(&roleName, "role", "r", defaultRole, "Specify the role to be used. Only valid for a new or temp session.")
+	rootCmd.PersistentFlags().StringVarP(&roleName, "role", "r", "", "Specify the role to be used. Only valid for a new or temp session.")
+	rootCmd.PersistentFlags().StringVarP(&backendName, "backend", "b", "", "Specify the backend to be used.")
 	rootCmd.PersistentFlags().BoolVarP(&newRole, "new-role", "n", false, "Create a new role.")
 	rootCmd.PersistentFlags().BoolP("help", "", false, "Show command usage.")
 	rootCmd.PersistentFlags().BoolVarP(&showVersion, "version", "v", false, "Show app version.")
@@ -166,14 +188,7 @@ func init() {
 	if err := os.MkdirAll(SessionDir, os.ModePerm); err != nil {
 		PFatal(err)
 	}
-	if err := os.MkdirAll(RoleDir, os.ModePerm); err != nil {
-		PFatal(err)
-	}
 	LoadCfg()
-	InitClient()
-	if err := CreateDefaultRole(); err != nil {
-		PFatal(err)
-	}
 }
 
 func main() {

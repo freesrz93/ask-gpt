@@ -15,6 +15,16 @@ var (
 )
 
 type config struct {
+	DefaultBackend string                    `yaml:"default_backend"`
+	Editor         string                    `yaml:"editor"`
+	EditorArg      string                    `yaml:"editor_arg"`
+	Backends       map[string]*BackendOption `yaml:"backends"`
+	Roles          map[string]Role           `yaml:"roles"`
+}
+
+type BackendOption struct {
+	Description      string  `yaml:"description"`
+	DefaultRole      string  `yaml:"default_role"`
 	BaseURL          string  `yaml:"url"`
 	APIKey           string  `yaml:"api_key"`
 	Model            string  `yaml:"model"`
@@ -23,8 +33,6 @@ type config struct {
 	TopP             float32 `yaml:"top_p"`
 	FrequencyPenalty float32 `yaml:"frequency_penalty"`
 	PresencePenalty  float32 `yaml:"presence_penalty"`
-	Editor           string  `yaml:"editor"`
-	EditorArg        string  `yaml:"editor_arg"`
 }
 
 func (c *config) String() string {
@@ -37,16 +45,28 @@ func (c *config) String() string {
 
 func newDefault() *config {
 	return &config{
-		BaseURL:          "https://api.openai.com/v1",
-		APIKey:           "",
-		Model:            "gpt-4o-mini",
-		MaxTokens:        4096,
-		Temperature:      0.5,
-		TopP:             1.0,
-		FrequencyPenalty: 0,
-		PresencePenalty:  0,
-		Editor:           "code",
-		EditorArg:        "%path",
+		DefaultBackend: backendOpenai,
+		Editor:         "code",
+		EditorArg:      "%path",
+		Backends: map[string]*BackendOption{
+			backendOpenai: {
+				Description:      "",
+				DefaultRole:      defaultRole,
+				BaseURL:          "https://api.openai.com/v1",
+				APIKey:           "",
+				Model:            "gpt-4o-mini",
+				MaxTokens:        4096,
+				Temperature:      0.5,
+				TopP:             1.0,
+				FrequencyPenalty: 0,
+				PresencePenalty:  0,
+			},
+		},
+		Roles: map[string]Role{
+			defaultRole: {
+				Description: "",
+				Prompt:      defaultPrompt,
+			}},
 	}
 }
 
