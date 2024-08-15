@@ -11,7 +11,7 @@ import (
 func NewClient(opt *BackendOption) *Client {
 	cfg := openai.DefaultConfig(opt.APIKey)
 	cfg.BaseURL = opt.BaseURL
-	return &Client{Client: openai.NewClientWithConfig(cfg)}
+	return &Client{BackendOption: opt, Client: openai.NewClientWithConfig(cfg)}
 }
 
 type Client struct {
