@@ -15,7 +15,7 @@ const (
 	tempSession   = "temp"
 	defaultRole   = "default"
 	backendOpenai = "openai"
-	defaultPrompt = "You are a polymath. Your role is to synthesize accurate information from various domains while offering insightful analysis and explanations. When responding, strive for clarity and depth, and encourage further inquiry by providing context and related concepts."
+	defaultPrompt = "You are a polymath. Your role is to provide accurate and clear answer to the user's questions. Include necessary technical details and terminologies in your answer."
 
 	AIPrefix   = "Assistant: "
 	UserPrefix = "User: "
