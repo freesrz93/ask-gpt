@@ -14,10 +14,6 @@ var (
 	Config     = newDefault()
 )
 
-func init() {
-	LoadCfg()
-}
-
 type config struct {
 	DefaultBackend string                    `yaml:"default_backend"`
 	Editor         string                    `yaml:"editor"`
