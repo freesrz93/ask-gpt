@@ -93,7 +93,7 @@ func handleSession(_ *cobra.Command, args []string) error {
 	}
 
 	if interactive {
-		interactiveMode(c, s, input)
+		interactiveMode(c, s)
 		return nil
 	}
 	return nil
@@ -150,11 +150,11 @@ func createRole() {
 	P("Role " + name + " created!")
 }
 
-func interactiveMode(client *Client, s *Session, input string) {
+func interactiveMode(client *Client, s *Session) {
 	scanner := bufio.NewScanner(os.Stdin)
 	P(UserPrefix)
 	for scanner.Scan() {
-		input = scanner.Text()
+		input := scanner.Text()
 		if input == "exit" || input == "q" {
 			break
 		}
