@@ -11,12 +11,12 @@ import (
 
 var SessionDir = filepath.Join(CfgDir, sessionDir)
 
-func ListSessions() []Session {
+func ListSessions() []*Session {
 	entries, err := os.ReadDir(SessionDir)
 	if err != nil {
 		return nil
 	}
-	res := make([]Session, 0)
+	res := make([]*Session, 0)
 	for _, e := range entries {
 		if e.IsDir() {
 			continue
@@ -30,7 +30,7 @@ func ListSessions() []Session {
 		if err != nil {
 			continue
 		}
-		res = append(res, r)
+		res = append(res, &r)
 	}
 	return res
 }

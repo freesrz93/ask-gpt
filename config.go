@@ -14,12 +14,16 @@ var (
 	Config     = newDefault()
 )
 
+func init() {
+	LoadCfg()
+}
+
 type config struct {
 	DefaultBackend string                    `yaml:"default_backend"`
 	Editor         string                    `yaml:"editor"`
 	EditorArg      string                    `yaml:"editor_arg"`
 	Backends       map[string]*BackendOption `yaml:"backends"`
-	Roles          map[string]Role           `yaml:"roles"`
+	Roles          map[string]*Role          `yaml:"roles"`
 }
 
 type BackendOption struct {
@@ -62,7 +66,7 @@ func newDefault() *config {
 				PresencePenalty:  0,
 			},
 		},
-		Roles: map[string]Role{
+		Roles: map[string]*Role{
 			defaultRole: {
 				Description: "",
 				Prompt:      defaultPrompt,

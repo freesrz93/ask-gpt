@@ -23,7 +23,7 @@ func GetRole(name string) (*Role, error) {
 	if !ok {
 		return nil, errors.New("role not exist")
 	}
-	return &r, nil
+	return r, nil
 }
 
 func CreateRole(name, desc, prompt string) error {
@@ -31,7 +31,7 @@ func CreateRole(name, desc, prompt string) error {
 	if ok {
 		return errors.New("role already exist")
 	}
-	Config.Roles[name] = Role{
+	Config.Roles[name] = &Role{
 		Description: desc,
 		Prompt:      prompt,
 	}
